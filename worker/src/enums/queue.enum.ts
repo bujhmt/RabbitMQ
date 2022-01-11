@@ -1,3 +1,3 @@
 export enum Queue {
-    DEFAULT = 'DEFAULT',
+    TASK_QUEUES = 'TASK_QUEUES',
 }

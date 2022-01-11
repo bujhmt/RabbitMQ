@@ -5,4 +5,5 @@ export interface Environment extends DotenvParseOutput{
     RABBIT_PASSWORD: string;
     RABBIT_HOST: string;
     RABBIT_PORT: string;
+    PREFETCH_COUNT: string;
 }
