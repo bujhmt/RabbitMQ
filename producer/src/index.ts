@@ -5,6 +5,8 @@ import {resolve} from 'path';
 import {Queue} from './enums/queue.enum';
 import {Environment} from './interfaces/environment.interface';
 
+const SEND_TIMEOUT = 1000;
+
 const {RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_HOST} = parse<Environment>(
     readFileSync(resolve(__dirname, '..', 'config', `.env`))
 );
@@ -23,11 +25,14 @@ async function main() {
 
     console.log(`${queue} queue asserted! Consumers: ${consumerCount}, total messages: ${messageCount}`);
 
-    const message = 'Hello RabbitMQ!';
+    let counter = 0;
+    setInterval(() => {
+        if (channel.sendToQueue(Queue.DEFAULT, Buffer.from(`Ping ${counter}`))) {
+            console.log(`[${queue}] Ping ${counter}!`);
+        }
 
-    if (channel.sendToQueue(Queue.DEFAULT, Buffer.from(message))) {
-        console.log(`[${queue}] Message was sent!`);
-    }
+        counter++;
+    }, SEND_TIMEOUT);
 }
 
 main()
