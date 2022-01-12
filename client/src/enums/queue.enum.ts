@@ -1,3 +1,3 @@
 export enum Queue {
-    RPC = 'RPC',
+    NEST = 'NEST',
 }
