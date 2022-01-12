@@ -2,6 +2,7 @@ import {connect} from 'amqplib';
 import {Environment} from './interfaces/environment.interface';
 import {getEnv} from './helpers/get-env.helper';
 import {Exchange} from './enums/exchange.enum';
+import {parseArgument} from './helpers/parse-argument.helper';
 
 const {RABBIT_PORT, RABBIT_USER, RABBIT_PASSWORD, RABBIT_HOST} = getEnv<Environment>();
 
@@ -13,11 +14,9 @@ async function main() {
 
     const channel = await connection.createChannel();
 
-    const {exchange} = await channel.assertExchange(Exchange.PUBLISH_SUBSCRIBE, 'fanout', {
+    const {exchange} = await channel.assertExchange(Exchange.ROUTING, 'direct', {
         durable: false,
     });
-
-    console.log(`${exchange} exchange asserted!`);
 
     const {queue} = await channel.assertQueue('', {
         exclusive: true,
@@ -25,11 +24,13 @@ async function main() {
 
     console.log(`${queue} queue asserted!`);
 
-    await channel.bindQueue(queue, exchange, '');
+    const type = parseArgument('-t') || '';
+
+    await channel.bindQueue(queue, exchange, type);
 
     await channel.consume(queue, (message) => {
         if (message.content) {
-            console.log(`New message: ${message.content.toString()}`);
+            console.log(`[${type || 'Any'}] New message: ${message.content.toString()}`);
         }
     }, {noAck: true});
 }
