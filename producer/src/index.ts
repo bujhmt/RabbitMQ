@@ -14,14 +14,14 @@ async function main() {
 
     const channel = await connection.createChannel();
 
-    const {exchange} = await channel.assertExchange(Exchange.ROUTING, 'direct', {
+    const {exchange} = await channel.assertExchange(Exchange.TOPICS, 'topic', {
         durable: false,
     });
 
-    const message = parseArgument('-m') || 'Ping';
+    const message = parseArgument('-m') || 'ping';
     const type = parseArgument('-t') || '';
 
-    if (channel.publish(exchange, type, Buffer.from(message))) {
+    if (channel.publish(exchange, `log.${type}`, Buffer.from(message))) {
         console.log('Message sent!');
     }
 

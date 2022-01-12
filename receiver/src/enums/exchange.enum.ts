@@ -1,3 +1,3 @@
 export enum Exchange {
-    ROUTING = 'ROUTING',
+    TOPICS = 'TOPICS',
 }

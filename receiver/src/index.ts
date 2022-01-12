@@ -14,7 +14,7 @@ async function main() {
 
     const channel = await connection.createChannel();
 
-    const {exchange} = await channel.assertExchange(Exchange.ROUTING, 'direct', {
+    const {exchange} = await channel.assertExchange(Exchange.TOPICS, 'topic', {
         durable: false,
     });
 
@@ -24,13 +24,13 @@ async function main() {
 
     console.log(`${queue} queue asserted!`);
 
-    const type = parseArgument('-t') || '';
+    const type = parseArgument('-t') || '*';
 
-    await channel.bindQueue(queue, exchange, type);
+    await channel.bindQueue(queue, exchange, `log.${type}`);
 
     await channel.consume(queue, (message) => {
         if (message.content) {
-            console.log(`[${type || 'Any'}] New message: ${message.content.toString()}`);
+            console.log(`[${type}] New message: ${message.content.toString()}`);
         }
     }, {noAck: true});
 }
